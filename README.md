@@ -225,17 +225,3 @@ pip install git+https://github.com/OpenDemon/anyone-to-skill.git
 anyone2skill
 ```
 
----
-
-## 与 nuwa-skill 的对比
-
-| 维度 | anyone-to-skill | nuwa-skill |
-|------|----------------|------------|
-| 使用门槛 | 路径 A 零门槛；路径 B 需 Python | 极低，npx 一键 |
-| 人物库 | 11 个，中文人物更丰富（孔子、庄子、段永平） | 7 个，偏西方 |
-| 蒸馏私人人物 | ✅ 核心能力 | ✗ 不支持 |
-| 支持的 LLM | OpenAI / Gemini / GLM，不绑定 Claude | 仅 Claude |
-| 运行方式 | 终端独立运行 + 生成 Skill 文件 | 仅 Claude Code Skill |
-| 自我蒸馏 | ✅ 支持 | ✗ 不支持 |
-
-**核心差距**：nuwa-skill 是「Famous People to Skill」，anyone-to-skill 才是真正的「Anyone to Skill」——你可以把你老板的 200 小时会议录音、某个大 V 的全部播客、或者你自己的聊天记录蒸馏出来，这是两者本质上的不同。
