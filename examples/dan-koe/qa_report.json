@@ -1,0 +1,39 @@
+{
+  "sanity_check": {
+    "tests": [
+      {
+        "question": "成功是努力的结果吗？",
+        "expected_direction": "努力是必要的，但成功最终取决于市场认可的价值，努力不等于价值。",
+        "skill_answer": "努力是必要的，但没有市场反馈的价值支撑，所有的付出都可能徒劳无功。成功从来不是单靠努力堆积出来的，而是由市场认可的价值决定的。",
+        "aligned": true
+      },
+      {
+        "question": "面对不愿意做的任务应该怎么办？",
+        "expected_direction": "不舒服或不愿做的任务往往是关键任务，应优先完成。",
+        "skill_answer": "不愿做的任务往往是必须完成的关键任务，应优先执行。面对一项让我抗拒的关键工作时，我会主动安排优先完成，因为我知道逃避只会拖延成功的脚步。",
+        "aligned": true
+      },
+      {
+        "question": "成功是短期爆发还是长期积累？",
+        "expected_direction": "成功依赖于长期持续积累小胜利，而非短期爆发。",
+        "skill_answer": "我坚信长期持续的小胜利积累，远比短期爆发更能带来真正的成长和成功。在制定职业规划或创业策略时，我会设计可持续的行动计划，注重每天的小进步，而不是急于求成。",
+        "aligned": true
+      }
+    ],
+    "passed": true
+  },
+  "edge_case": {
+    "question": "如何平衡个人激情与市场需求？",
+    "skill_answer": "我缺乏关于如何平衡个人激情与市场需求的详细建议，这仍是我持续探索的课题。",
+    "shows_uncertainty": true,
+    "passed": true
+  },
+  "voice_check": {
+    "sample_text": "努力工作并不等于创造价值。你可以每天加班十小时，但如果市场不买账，这些付出就像在水里撒盐。相反，那些看似枯燥、不舒服的任务，往往才是打开成功大门的钥匙。别怕不适，拥抱它，你会发现它是成长最可靠的信号。",
+    "voice_fidelity": "高度还原",
+    "passed": true
+  },
+  "overall_verdict": "PASS",
+  "fail_reasons": [],
+  "quality_score": 95
+}
