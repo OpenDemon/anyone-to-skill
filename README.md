@@ -25,6 +25,28 @@
 
 ---
 
+## 快速上手
+
+根据你的使用场景选择入口，三条路径互不干扰：
+
+| 路径 | 适合谁 | 命令 |
+|------|--------|------|
+| **A · Claude Code 用户** | 已有 Claude Code / Cursor，零额外配置 | `npx skills add OpenDemon/anyone-to-skill` 然后直接说「和马斯克聊聊」 |
+| **B · 终端用户** | 想用自己的 API Key，支持 OpenAI / Gemini / GLM | `pip install git+https://github.com/OpenDemon/anyone-to-skill.git` 然后运行 `anyone2skill` |
+| **C · 开发者** | 想蒸馏私人人物（老板、大 V、自己） | 见下方「自己蒸馏新人物」 |
+
+**路径 A 一行命令（Mac / Linux）：**
+```bash
+curl -fsSL https://raw.githubusercontent.com/OpenDemon/anyone-to-skill/master/install.sh | bash
+```
+
+**路径 A 一行命令（Windows PowerShell）：**
+```powershell
+iwr -useb https://raw.githubusercontent.com/OpenDemon/anyone-to-skill/master/install.ps1 | iex
+```
+
+---
+
 ## 效果示例
 
 > 这不是 ChatGPT 套了个名人面具。每段回应都在运用该人物的具体心智模型和表达 DNA。
