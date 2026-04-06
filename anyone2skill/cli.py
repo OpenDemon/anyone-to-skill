@@ -86,18 +86,20 @@ BUILTIN_FIGURES = [
 # ── 持久化配置 ─────────────────────────────────────────────────────────────────
 
 def load_config() -> dict:
-    """从 ~/.anyone2skill/config.json 加载保存的 API key"""
+    """从 ~/.anyone2skill/config.json 加载保存的 API key（兼容 BOM）"""
     if CONFIG_FILE.exists():
         try:
-            return json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+            # utf-8-sig 自动去掉 BOM（Windows PowerShell 写入的文件常带 BOM）
+            return json.loads(CONFIG_FILE.read_text(encoding="utf-8-sig"))
         except Exception:
             pass
     return {}
 
 
 def save_config(config: dict):
-    """保存 API key 到 ~/.anyone2skill/config.json"""
+    """保存 API key 到 ~/.anyone2skill/config.json（无 BOM）"""
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    # 用 utf-8（无 BOM）写入，避免下次读取时 key 带 BOM 前缀
     CONFIG_FILE.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
