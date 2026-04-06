@@ -13,7 +13,7 @@ Write-Host "  |         Windows PowerShell Installer                 |" -Foregro
 Write-Host "  +------------------------------------------------------+" -ForegroundColor Cyan
 Write-Host ""
 
-# ── Step 1: Check Python ─────────────────────────────────────────────────────
+# - Step 1: Check Python -
 Write-Host "  [1/4] Checking Python..." -ForegroundColor White
 
 $python = $null
@@ -35,13 +35,13 @@ if (-not $python) {
     exit 1
 }
 
-# ── Step 2: Install package ──────────────────────────────────────────────────
+# - Step 2: Install package -
 Write-Host ""
 Write-Host "  [2/4] Installing anyone2skill..." -ForegroundColor White
 & $python -m pip install --quiet --upgrade "git+https://github.com/OpenDemon/anyone-to-skill.git"
 Write-Host "  OK  Installed successfully." -ForegroundColor Green
 
-# ── Step 3: Configure API Key ────────────────────────────────────────────────
+# - Step 3: Configure API Key -
 Write-Host ""
 Write-Host "  [3/4] Configure API Key" -ForegroundColor White
 Write-Host "  Supports OpenAI / Gemini / GLM. Configure at least one." -ForegroundColor Yellow
@@ -92,7 +92,7 @@ if ($glmKey)    { $config["GLM_API_KEY"]    = $glmKey    }
 $config | ConvertTo-Json | Set-Content $configFile -Encoding UTF8
 Write-Host "  OK  Config saved to $configFile" -ForegroundColor Green
 
-# ── Step 4: Done ─────────────────────────────────────────────────────────────
+# - Step 4: Done -
 Write-Host ""
 Write-Host "  [4/4] Done! Now run:" -ForegroundColor White
 Write-Host ""
