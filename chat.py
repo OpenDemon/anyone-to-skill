@@ -131,20 +131,31 @@ def select_api() -> tuple[str, str]:
             idx = int(choice) - 1
             if 0 <= idx < len(items):
                 api_name, cfg = items[idx]
-                key = os.environ.get(cfg["env"], "")
-                if not key:
-                    print(f"\n  {Y}该 API 未设置 Key，请直接粘贴：{R}")
-                    print(f"  {DIM}Windows: $env:{cfg['env']}=\"your-key\"{R}\n")
+                existing_key = os.environ.get(cfg["env"], "")
+                if existing_key:
+                    # 已有 key，显示隐藏版本，允许直接回车确认或重新粘贴
+                    masked = existing_key[:6] + "*" * max(0, len(existing_key) - 10) + existing_key[-4:]
+                    print(f"\n  {G}当前 Key: {masked}{R}")
+                    sys.stdout.write(f"  {DIM}回车确认使用此 Key，或直接粘贴新 Key >{R} ")
+                    sys.stdout.flush()
+                    try:
+                        new_key = read_line()
+                    except KeyboardInterrupt:
+                        sys.exit(0)
+                    key = new_key.strip() if new_key.strip() else existing_key
+                else:
+                    # 未设置 key，直接要求输入
+                    print(f"\n  {Y}未检测到 {cfg['name']} Key，请直接粘贴：{R}")
                     sys.stdout.write(f"  {C}粘贴 API Key >{R} ")
                     sys.stdout.flush()
                     try:
-                        key = read_line()
+                        key = read_line().strip()
                     except KeyboardInterrupt:
                         sys.exit(0)
                     if not key:
-                        print(f"  {Y}未输入 key，退出。{R}")
-                        sys.exit(1)
-                    os.environ[cfg["env"]] = key
+                        print(f"  {Y}未输入 key，请重新选择{R}")
+                        continue
+                os.environ[cfg["env"]] = key
                 return api_name, key
         except ValueError:
             pass
