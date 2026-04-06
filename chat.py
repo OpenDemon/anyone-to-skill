@@ -479,14 +479,20 @@ def main():
         elif len(available) == 1:
             api_name = available[0][0]
         elif args.person or args.skill:
-            # 非交互模式：按 config.json 中 key 的写入顺序选最后一个（最近配置的）
+            # 非交互模式：优先用 config.json 中最后写入的 Key（即用户最近主动配置的）
             config = load_config()
             last_api = None
-            for env_key, _ in config.items():
+            # 按 config.json key 顺序遇到的最后一个有效 API
+            for env_key in config:
                 for n, c in API_CONFIGS.items():
-                    if c["env"] == env_key and os.environ.get(env_key):
+                    if c["env"] == env_key and config.get(env_key):
                         last_api = n
-            api_name = last_api if last_api else available[0][0]
+            if last_api:
+                api_name = last_api
+                # 确保该 key 已加载到环境变量
+                os.environ[API_CONFIGS[api_name]["env"]] = config[API_CONFIGS[api_name]["env"]]
+            else:
+                api_name = available[0][0]
             api_label = API_CONFIGS[api_name]["name"]
             print(f"  {DIM}使用 API: {api_label}  (可用 --api glm/openai/gemini 切换){R}\n")
         else:
