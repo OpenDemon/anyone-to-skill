@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anyone2skill"
+version = "0.1.0"
+description = "Distill anyone into a SKILL.md — chat with Musk, Jobs, Confucius in your terminal"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = [
+    "openai>=1.0.0",
+]
+
+[project.scripts]
+anyone2skill = "anyone2skill.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["anyone2skill*"]
