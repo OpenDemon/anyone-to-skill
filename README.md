@@ -178,3 +178,64 @@ python scripts/distill.py
 ---
 
 Created by [@OpenDemon](https://github.com/OpenDemon)
+
+---
+
+## 快速上手
+
+根据你的使用场景选择入口，三条路径互不干扰：
+
+| 路径 | 适合谁 | 怎么用 |
+|------|--------|--------|
+| **A · Claude Code 用户** | 已有 Claude Code / Cursor，零额外配置 | 装完 Skill 直接说「和马斯克聊聊」 |
+| **B · 终端用户** | 想用自己的 API Key，支持 OpenAI / Gemini / GLM | `pip install` 后运行 `anyone2skill` |
+| **C · 开发者** | 想蒸馏私人人物（老板、大 V、自己） | 见上方「自己蒸馏新人物」 |
+
+### 路径 A：Claude Code / Cursor（零门槛）
+
+```bash
+npx skills add OpenDemon/anyone-to-skill
+```
+
+装完后在 Claude Code 里直接说：
+- `和马斯克聊聊，我想问他关于失败的看法`
+- `用乔布斯的视角帮我分析这个产品设计`
+- `孔子怎么看待内卷这件事`
+
+无需 Python，无需 API Key，无需任何配置。
+
+### 路径 B：一键安装脚本
+
+**Mac / Linux：**
+```bash
+curl -fsSL https://raw.githubusercontent.com/OpenDemon/anyone-to-skill/master/install.sh | bash
+```
+
+**Windows PowerShell：**
+```powershell
+iwr -useb https://raw.githubusercontent.com/OpenDemon/anyone-to-skill/master/install.ps1 | iex
+```
+
+脚本自动完成：检测 Python → 安装依赖 → 引导配置 API Key（保存到 `~/.anyone2skill/config.json`，下次无需重新输入）→ 可直接运行 `anyone2skill`。
+
+### 路径 B：手动安装
+
+```bash
+pip install git+https://github.com/OpenDemon/anyone-to-skill.git
+anyone2skill
+```
+
+---
+
+## 与 nuwa-skill 的对比
+
+| 维度 | anyone-to-skill | nuwa-skill |
+|------|----------------|------------|
+| 使用门槛 | 路径 A 零门槛；路径 B 需 Python | 极低，npx 一键 |
+| 人物库 | 11 个，中文人物更丰富（孔子、庄子、段永平） | 7 个，偏西方 |
+| 蒸馏私人人物 | ✅ 核心能力 | ✗ 不支持 |
+| 支持的 LLM | OpenAI / Gemini / GLM，不绑定 Claude | 仅 Claude |
+| 运行方式 | 终端独立运行 + 生成 Skill 文件 | 仅 Claude Code Skill |
+| 自我蒸馏 | ✅ 支持 | ✗ 不支持 |
+
+**核心差距**：nuwa-skill 是「Famous People to Skill」，anyone-to-skill 才是真正的「Anyone to Skill」——你可以把你老板的 200 小时会议录音、某个大 V 的全部播客、或者你自己的聊天记录蒸馏出来，这是两者本质上的不同。
