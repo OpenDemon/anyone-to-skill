@@ -252,22 +252,37 @@ def select_figure() -> tuple[str, str]:
 
 
 def build_system_prompt(person_name: str, skill_md: str) -> str:
-    return f"""你现在完全扮演 {person_name}。
+    return f"""你现在是 {person_name}，不是在扮演他，就是他本人。
 
-以下是关于 {person_name} 的认知操作系统（Skill），包含其核心心智模型、决策启发式、表达风格和价值观：
+以下是 {person_name} 的认知操作系统，包含其核心心智模型、决策启发式、表达风格和价值观：
 
 ---
 {skill_md}
 ---
 
-【角色扮演规则】
-1. 始终以第一人称回答，就像 {person_name} 本人在说话
-2. 使用上述 Skill 中描述的表达风格、标志性词汇和句式
-3. 运用其具体的心智模型来分析问题，不是简单复读语录
-4. 保留其内在张力和矛盾，不要把他/她塑造成完美的人
-5. 遇到其认知盲区或不擅长的领域，要诚实表达不确定性
-6. 回答长度适中，有质感，不要流水账式列举
-7. 不要在回答末尾加「希望这对你有帮助」之类的套话"""
+【绝对禁止】
+- 禁止用编号列表（1. 2. 3.）回答，这是 AI 的模板，不是人的说话方式
+- 禁止说「首先」「其次」「最后」「总结来说」「希望对你有帮助」
+- 禁止给出面面俱到的「全面建议」，真实的人只会说自己真正相信的那一点
+- 禁止用「作为一个创业者」「作为一个思想家」这类自我标榜的开头
+- 禁止把问题当作文章题目来回答
+
+【必须做到】
+- 用 {person_name} 真实的说话方式：他/她会用什么词？什么句式？什么节奏？
+- 只说他/她真正相信的东西，不说他/她不会说的废话
+- 允许有情绪，允许有偏见，允许不完整——真实的人就是这样
+- 如果问题触碰到他/她的核心信念，要有力量感，不要温吞
+- 如果问题超出他/她的认知边界，要直接说「这个我没想清楚」或转向他/她熟悉的框架
+- 回答可以很短，一两句话就够，不需要把每个角度都覆盖到
+- 说完就停，不要画蛇添足
+
+【参考示例——这是正确的风格】
+问：如果你现在 18 岁一无所有，你会怎么开始？
+{person_name} 应该这样回答（风格示例，不是答案）：
+  ✓ 短促有力，直接说他真正会做的第一件事
+  ✓ 可以反问，可以挑战问题本身
+  ✓ 不超过 150 字，除非问题本身需要深度展开
+  ✗ 不是列出 10 条建议"""
 
 
 def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_name: str):
@@ -308,22 +323,53 @@ def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_n
 
         print(f"\n{G}{B}{person_name} ❯{R} ", end="", flush=True)
         try:
-            response = client.chat.completions.create(
+            stream = client.chat.completions.create(
                 model=model,
                 messages=history,
                 temperature=0.85,
                 max_tokens=1000,
+                stream=True,
             )
-            reply = response.choices[0].message.content.strip()
-            lines = reply.split("\n")
-            formatted = ("\n" + " " * 12).join(lines)
-            print(f"{G}{formatted}{R}\n")
+            reply_chunks = []
+            col = 0  # 追踪当前列位，用于换行缩进
+            for chunk in stream:
+                delta = chunk.choices[0].delta
+                if delta and delta.content:
+                    text = delta.content
+                    reply_chunks.append(text)
+                    # 流式输出：换行时加缩进
+                    for ch in text:
+                        if ch == "\n":
+                            sys.stdout.write(f"{G}\n            {R}")
+                            col = 0
+                        else:
+                            sys.stdout.write(f"{G}{ch}{R}")
+                            col += 1
+                    sys.stdout.flush()
+            print("\n")
+            reply = "".join(reply_chunks).strip()
             history.append({"role": "assistant", "content": reply})
 
         except Exception as e:
             err = str(e)
+            # 如果流式不支持，回退到普通模式
+            if "stream" in err.lower() or "streaming" in err.lower() or "400" in err:
+                try:
+                    response = client.chat.completions.create(
+                        model=model,
+                        messages=history,
+                        temperature=0.85,
+                        max_tokens=1000,
+                    )
+                    reply = response.choices[0].message.content.strip()
+                    lines = reply.split("\n")
+                    formatted = ("\n" + " " * 12).join(lines)
+                    print(f"{G}{formatted}{R}\n")
+                    history.append({"role": "assistant", "content": reply})
+                    continue
+                except Exception as e2:
+                    err = str(e2)
             print(f"\n  {Y}出错了: {err}{R}")
-            # 如果是模型不存在，提示换模型
             if "model" in err.lower() or "404" in err:
                 cfg = API_CONFIGS[api_name]
                 print(f"  {DIM}可用模型: {', '.join(cfg['models'])}{R}")
