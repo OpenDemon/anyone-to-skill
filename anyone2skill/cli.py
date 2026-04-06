@@ -474,8 +474,25 @@ def main():
     else:
         # 检测可用 key
         available = [(n, os.environ.get(c["env"], "")) for n, c in API_CONFIGS.items() if os.environ.get(c["env"], "")]
-        if len(available) == 1:
+        if len(available) == 0:
+            api_name, _ = select_api()
+        elif len(available) == 1:
             api_name = available[0][0]
+        elif args.person or args.skill:
+            # 非交互模式：config.json 中最后写入的 Key 优先级最高（不受系统环境变量干扰）
+            config = load_config()
+            last_api = None
+            for env_key in config:
+                for n, c in API_CONFIGS.items():
+                    if c["env"] == env_key and config.get(env_key):
+                        last_api = n
+            if last_api:
+                api_name = last_api
+                os.environ[API_CONFIGS[api_name]["env"]] = config[API_CONFIGS[api_name]["env"]]
+            else:
+                api_name = available[0][0]
+            api_label = API_CONFIGS[api_name]["name"]
+            print(f"  {DIM}使用 API: {api_label}  (可用 --api glm/openai/gemini 切换){R}\n")
         else:
             api_name, _ = select_api()
 
