@@ -1,10 +1,85 @@
 # Anyone to Skill
 
-**把任何人蒸馏成Skill。**
-
-给一个 YouTube 频道链接、一堆 PDF、聊天记录、电子书——系统自动提取此人的心智模型、决策启发式、表达风格，输出一个可以让 AI 像他一样思考的 `SKILL.md`。
+**把任何人蒸馏成可安装的 AI Skill。**
 
 作者：[OPENDEMON](https://github.com/OpenDemon)
+
+[简体中文](#简体中文) · [English](#english) · [繁體中文](#繁體中文) · [日本語](#日本語) · [한국어](#한국어)
+
+---
+
+## 简体中文
+
+你崇拜的那个人，你永远约不到他。
+你想学的那套思维，淹没在几千小时的视频里。
+你读完的那本书，三天后只剩一个模糊的感觉。
+你的偶像在讲台上说了一辈子，你却只记住了一句金句。
+
+**把他们蒸馏成 Skill，让 AI 用他们的方式思考，随时回答你的问题。**
+
+丢进去视频、PDF、聊天记录、电子书——任何材料。
+系统提取心智模型、决策启发式、表达风格。
+输出一个可安装的 `SKILL.md`，在任何 AI 工具里激活。
+
+---
+
+## English
+
+The person you admire most — you'll never get a meeting with them.
+The mental models you want to learn — buried in thousands of hours of content.
+The book you finished — three days later, just a vague feeling remains.
+Your idol spent a lifetime on stage, and you only remember one quote.
+
+**Distill them into a Skill. Let AI think like them, answer your questions, anytime.**
+
+Drop in videos, PDFs, chat logs, ebooks — any material.
+The system extracts mental models, decision heuristics, and voice DNA.
+Outputs an installable `SKILL.md` that activates in any AI tool.
+
+---
+
+## 繁體中文
+
+你崇拜的那個人，你永遠約不到他。
+你想學的那套思維，淹沒在幾千小時的影片裡。
+你讀完的那本書，三天後只剩一個模糊的感覺。
+你的偶像在講台上說了一輩子，你卻只記住了一句金句。
+
+**把他們蒸餾成 Skill，讓 AI 用他們的方式思考，隨時回答你的問題。**
+
+丟進去影片、PDF、聊天記錄、電子書——任何材料。
+系統提取心智模型、決策啟發式、表達風格。
+輸出一個可安裝的 `SKILL.md`，在任何 AI 工具裡啟動。
+
+---
+
+## 日本語
+
+尊敬するあの人には、永遠に会えない。
+学びたい思考法は、何千時間ものコンテンツに埋もれている。
+読み終えた本も、三日後には曖昧な感覚しか残らない。
+あなたの憧れは一生語り続けたのに、あなたが覚えているのは一言だけ。
+
+**彼らを Skill に蒸留して、AI に彼らのように考えさせよう。いつでも、あなたの質問に答えてもらおう。**
+
+動画・PDF・チャット履歴・電子書籍——どんな素材でも投入できる。
+システムがメンタルモデル・意思決定ヒューリスティクス・表現スタイルを抽出。
+どの AI ツールでも有効化できるインストール可能な `SKILL.md` を出力。
+
+---
+
+## 한국어
+
+당신이 존경하는 그 사람, 당신은 영원히 만날 수 없다.
+배우고 싶은 사고방식은 수천 시간의 콘텐츠 속에 묻혀 있다.
+다 읽은 책도 사흘 후엔 희미한 느낌만 남는다.
+당신의 우상은 평생 무대에서 말했지만, 당신은 명언 하나만 기억한다.
+
+**그들을 Skill로 증류하여, AI가 그들처럼 생각하게 하자. 언제든지 당신의 질문에 답하도록.**
+
+영상, PDF, 채팅 기록, 전자책——어떤 자료든 넣으면 된다.
+시스템이 멘탈 모델, 의사결정 휴리스틱, 표현 스타일을 추출한다.
+어떤 AI 도구에서도 활성화할 수 있는 설치 가능한 `SKILL.md`를 출력한다.
 
 ---
 
