@@ -1,0 +1,2 @@
+[console_scripts]
+anyone2skill = anyone2skill.cli:main

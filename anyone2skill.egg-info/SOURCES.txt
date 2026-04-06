@@ -1,0 +1,10 @@
+README.md
+pyproject.toml
+anyone2skill/__init__.py
+anyone2skill/cli.py
+anyone2skill.egg-info/PKG-INFO
+anyone2skill.egg-info/SOURCES.txt
+anyone2skill.egg-info/dependency_links.txt
+anyone2skill.egg-info/entry_points.txt
+anyone2skill.egg-info/requires.txt
+anyone2skill.egg-info/top_level.txt

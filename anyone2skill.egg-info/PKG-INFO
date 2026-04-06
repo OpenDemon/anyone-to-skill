@@ -1,0 +1,167 @@
+Metadata-Version: 2.4
+Name: anyone2skill
+Version: 0.1.0
+Summary: Distill anyone into a SKILL.md — chat with Musk, Jobs, Confucius in your terminal
+License: MIT
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: openai>=1.0.0
+
+<div align="center">
+
+# Anyone to Skill
+
+> *"你是否也想与先贤对话，无论你想和任何人对话，学习任何人的思维模式，Anyone to Skill都能满足你。现在，你可以直接和马斯克、黄仁勋、孔子对话了。"*
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://python.org)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blueviolet)](https://claude.ai/code)
+[![AgentSkills](https://img.shields.io/badge/AgentSkills-Standard-green)](https://agentskills.io)
+
+<br>
+
+丢进去视频、PDF、聊天记录、电子书——任何材料。<br>
+系统提取心智模型、决策启发式、表达风格。<br>
+输出一个可安装的 `SKILL.md`，在任何 AI 工具里激活。<br>
+
+**把任何人蒸馏成可安装的 AI Skill，随时回答你的问题。**
+
+<br>
+
+[数据来源](#支持的数据来源) · [安装](#安装) · [使用](#使用) · [效果示例](#效果示例) · [**English**](README_EN.md) · [**繁體中文**](README_ZH_TW.md) · [**日本語**](README_JA.md) · [**한국어**](README_KO.md)
+
+</div>
+
+---
+
+## 效果示例
+
+> 这不是 ChatGPT 套了个名人面具。每段回应都在运用该人物的具体心智模型和表达 DNA。
+
+### 场景一：马斯克谈面对失败
+
+```
+用户      ❯ 我们公司的火箭发射失败了三次，董事会要求我们放弃这个项目，你怎么看？
+
+Elon Musk ❯ 三次失败听起来很糟糕，但这是进入航天领域的标配，不是终结信号。
+            火箭发射的本质是极其复杂的工程挑战，失败是快速迭代和学习的必经阶段。
+            
+            放弃项目意味着放弃了用第一性原理解决人类星际移民根本问题的机会，这种机会是任何企业都承担不起丢弃的。
+            董事会的恐惧源于短期思维，我的使命是超越短视，把眼光放到几十年后。
+            
+            失败没什么好怕的，真正的问题是你是否从失败中学到了足够多，能加速下一次成功。
+```
+
+### 场景二：乔布斯谈用户需求
+
+```
+用户      ❯ 我们做了用户调研，80% 的用户希望我们加一个分享按钮，你觉得应该加吗？
+
+Steve Jobs ❯ 你知道，用户往往不知道他们真正想要什么——他们只能告诉你他们已经习惯的东西。
+             我们不做产品，是为了满足用户当前的需求；我们做产品，是为了创造他们未来期待的、甚至连他们自己都没想到的体验。
+             
+             那个分享按钮，它背后的意义是什么？它是否让产品变得更简单、更美，还是只是在满足表面的需求？
+             我要问自己：加了它，整体体验会不会被割裂，或者变得复杂？
+             
+             如果答案是否定的，我们才会去做。否则，我们宁可说“不”，保持极简，追求那个“insanely great”的用户体验。
+             记住，创新不是回应多数人的呼声，而是引领他们走向一个全新的可能。
+```
+
+### 场景三：黄仁勋谈战略追赶
+
+```
+用户      ❯ 我们团队在 AI 芯片方向上落后竞争对手两年，还有必要继续追吗？
+
+Jensen Huang ❯ 两年的差距很大，但这不是简单的数字游戏，而是根基和战略的问题。
+               我们要回到第一性原理，问自己：AI芯片未来真正需要什么样的架构和生态？如果只是追赶别人已经走过的老路，那毫无意义。
+               
+               真正的胜负点在于，我们是否能够构建一个完整的生态飞轮，让开发者、硬件和软件形成正向循环，那才是护城河。
+               更重要的是，拥抱这种落后的痛苦，把它视为重新设计和革新的机会，而不是放弃的理由。
+               
+               只有敢于承受磨难，才能创造真正的突破。所以，我会说，继续追，但不是盲目追赶，是要用全新的视角和全力以赴的态度，实现颠覆性的领先。
+```
+
+---
+
+## 已蒸馏人物库
+
+你可以直接安装以下已经蒸馏好的人物 Skill：
+
+| 人物 | 领域 | 安装命令 |
+|------|------|---------|
+| [马斯克](https://github.com/OpenDemon/elon-musk-skill) | 科技创业 · 第一性原理 | `npx skills add OpenDemon/elon-musk-skill` |
+| [乔布斯](https://github.com/OpenDemon/steve-jobs-skill) | 产品设计 · 极简主义 | `npx skills add OpenDemon/steve-jobs-skill` |
+| [比尔盖茨](https://github.com/OpenDemon/bill-gates-skill) | 软件战略 · 全球健康 | `npx skills add OpenDemon/bill-gates-skill` |
+| [段永平](https://github.com/OpenDemon/duan-yongping-skill) | 价值投资 · 本分哲学 | `npx skills add OpenDemon/duan-yongping-skill` |
+| [纳瓦尔](https://github.com/OpenDemon/naval-ravikant-skill) | 财富自由 · 特定知识 | `npx skills add OpenDemon/naval-ravikant-skill` |
+| [张雪峰](https://github.com/OpenDemon/zhang-xue-feng-skill) | 教育规划 · 务实主义 | `npx skills add OpenDemon/zhang-xue-feng-skill` |
+| [孔子](https://github.com/OpenDemon/kong-zi-skill) | 仁义礼学 · 修身齐家 | `npx skills add OpenDemon/kong-zi-skill` |
+| [庄子](https://github.com/OpenDemon/zhuang-zi-skill) | 逍遥哲学 · 齐物论 | `npx skills add OpenDemon/zhuang-zi-skill` |
+| [Karpathy](https://github.com/OpenDemon/andrej-karpathy-skill) | 深度学习 · AI 教育 | `npx skills add OpenDemon/andrej-karpathy-skill` |
+| [黄仁勋](https://github.com/OpenDemon/jensen-huang-skill) | 芯片战略 · 加速主义 | `npx skills add OpenDemon/jensen-huang-skill` |
+| [Dan Koe](https://github.com/OpenDemon/dan-koe-skill) | 一人企业 · 个人品牌 | `npx skills add OpenDemon/dan-koe-skill` |
+
+---
+
+## 使用
+
+### 方式一：终端直接对话（推荐）
+
+无需任何 AI 工具，直接在终端里和他们聊天：
+
+```bash
+git clone https://github.com/OpenDemon/anyone-to-skill
+cd anyone-to-skill
+pip install openai
+
+# 设置你的 API Key（支持 OpenAI / Gemini / GLM智谱）
+export OPENAI_API_KEY="sk-..."
+
+# 启动聊天
+python chat.py
+```
+
+### 方式二：安装到 AI 编程工具
+
+如果你使用 Claude Code、Cursor 等工具，可以直接安装：
+
+```bash
+npx skills add OpenDemon/elon-musk-skill
+```
+
+安装后在工具内直接提问：`用马斯克的视角帮我分析这个商业模式`
+
+---
+
+## 自己蒸馏新人物
+
+```bash
+# 安装依赖
+pip install openai PyMuPDF python-docx yt-dlp beautifulsoup4 requests
+
+# 方式一：丢本地文件
+python scripts/distill.py --target "Dan Koe" --files video.mp4 book.pdf
+
+# 方式二：直接给 YouTube 频道
+python scripts/distill.py --url https://www.youtube.com/@DanKoeTalks
+
+# 方式三：交互模式（推荐新手）
+python scripts/distill.py
+```
+
+---
+
+## 支持的数据来源
+
+| 来源 | 支持状态 | 备注 |
+|------|:-------:|------|
+| YouTube 频道/视频 | ✅ | 自动下载字幕或音频转录 |
+| 本地视频/音频 | ✅ | 支持 mp4, mp3, wav 等 |
+| PDF 文档 | ✅ | 自动提取文本 |
+| Word 文档 | ✅ | 支持 docx |
+| 聊天记录 JSON | ✅ | 支持标准导出格式 |
+| 纯文本/Markdown | ✅ | 直接解析 |
+
+---
+
+Created by [@OpenDemon](https://github.com/OpenDemon)

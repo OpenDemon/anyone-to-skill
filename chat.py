@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-chat.py — Anyone to Skill 终端对话入口
+Anyone to Skill — 终端对话入口
+在终端里直接与任何人对话
 
 支持的 API：
   - OpenAI      OPENAI_API_KEY=sk-...
@@ -9,17 +9,18 @@ chat.py — Anyone to Skill 终端对话入口
   - GLM（智谱）  GLM_API_KEY=...
 
 用法：
-    python chat.py                          # 交互式选择人物
-    python chat.py --person 马斯克
-    python chat.py --person Karpathy
-    python chat.py --skill path/to/SKILL.md
-    python chat.py --api gemini             # 强制指定 API
+    anyone2skill                          # 交互式选择人物
+    anyone2skill --person 马斯克
+    anyone2skill --person Karpathy
+    anyone2skill --api glm --person 孔子
+    anyone2skill --skill path/to/SKILL.md
 
 依赖：pip install openai
 """
 
 import os
 import sys
+import json
 import argparse
 from pathlib import Path
 from openai import OpenAI
@@ -33,15 +34,20 @@ G   = "\033[92m"    # 绿色（人物）
 Y   = "\033[93m"    # 黄色（警告）
 M   = "\033[95m"    # 紫色（标题）
 
+# ── 配置目录 ───────────────────────────────────────────────────────────────────
+CONFIG_DIR  = Path.home() / ".anyone2skill"
+CONFIG_FILE = CONFIG_DIR / "config.json"
+CACHE_DIR   = CONFIG_DIR / "skills"
+
 # ── API 配置 ──────────────────────────────────────────────────────────────────
 API_CONFIGS = {
     "openai": {
         "name": "OpenAI",
         "env":  "OPENAI_API_KEY",
-        "base_url": None,           # 使用默认
+        "base_url": None,
         "models": ["gpt-4.1-mini", "gpt-4o-mini", "gpt-4o"],
         "default_model": "gpt-4.1-mini",
-        "hint": "export OPENAI_API_KEY=sk-..."
+        "hint": "https://platform.openai.com/api-keys"
     },
     "gemini": {
         "name": "Gemini",
@@ -49,7 +55,7 @@ API_CONFIGS = {
         "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
         "models": ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"],
         "default_model": "gemini-2.0-flash",
-        "hint": "export GEMINI_API_KEY=AIza..."
+        "hint": "https://aistudio.google.com/app/apikey"
     },
     "glm": {
         "name": "GLM（智谱）",
@@ -57,7 +63,7 @@ API_CONFIGS = {
         "base_url": "https://open.bigmodel.cn/api/paas/v4/",
         "models": ["glm-4-flash", "glm-4-air", "glm-4"],
         "default_model": "glm-4-flash",
-        "hint": "export GLM_API_KEY=your-zhipu-key"
+        "hint": "https://open.bigmodel.cn/usercenter/apikeys"
     },
 }
 
@@ -76,8 +82,35 @@ BUILTIN_FIGURES = [
     {"name": "Dan Koe",    "repo": "OpenDemon/dan-koe-skill",           "domain": "一人企业 · 个人品牌"},
 ]
 
-CACHE_DIR = Path.home() / ".anyone_to_skill" / "skills"
 
+# ── 持久化配置 ─────────────────────────────────────────────────────────────────
+
+def load_config() -> dict:
+    """从 ~/.anyone2skill/config.json 加载保存的 API key"""
+    if CONFIG_FILE.exists():
+        try:
+            return json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {}
+
+
+def save_config(config: dict):
+    """保存 API key 到 ~/.anyone2skill/config.json"""
+    CONFIG_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_FILE.write_text(json.dumps(config, indent=2, ensure_ascii=False), encoding="utf-8")
+
+
+def load_saved_keys():
+    """把保存的 key 加载到环境变量（优先级低于已有环境变量）"""
+    config = load_config()
+    for api_name, cfg in API_CONFIGS.items():
+        env_key = cfg["env"]
+        if not os.environ.get(env_key) and config.get(env_key):
+            os.environ[env_key] = config[env_key]
+
+
+# ── 输入工具 ───────────────────────────────────────────────────────────────────
 
 def read_line() -> str:
     """跨平台读取一行输入，正确处理 UTF-8"""
@@ -91,20 +124,10 @@ def read_line() -> str:
         raise KeyboardInterrupt
 
 
-def detect_api() -> tuple[str, str]:
-    """检测所有可用的 API key，如果只有一个就直接用，多个则让用户选"""
-    available = []
-    for name, cfg in API_CONFIGS.items():
-        key = os.environ.get(cfg["env"], "")
-        if key:
-            available.append((name, key))
-    if len(available) == 1:
-        return available[0]
-    return None, None
-
+# ── API 选择 ───────────────────────────────────────────────────────────────────
 
 def select_api() -> tuple[str, str]:
-    """交互式选择 API，显示所有已检测到的 key"""
+    """交互式选择 API，显示所有已检测到的 key，选完后持久化保存"""
     items = list(API_CONFIGS.items())
     available_count = sum(1 for _, cfg in items if os.environ.get(cfg["env"], ""))
 
@@ -115,7 +138,11 @@ def select_api() -> tuple[str, str]:
 
     for i, (name, cfg) in enumerate(items, 1):
         key = os.environ.get(cfg["env"], "")
-        status = f"{G}✓ 已设置{R}" if key else f"{DIM}未设置{R}"
+        if key:
+            masked = key[:4] + "****" + key[-4:] if len(key) > 8 else "****"
+            status = f"{G}✓ 已设置  {DIM}{masked}{R}"
+        else:
+            status = f"{DIM}未设置{R}"
         print(f"  {C}{B}[{i}]{R}  {B}{cfg['name']:<14}{R}  {status}")
     print()
 
@@ -132,11 +159,11 @@ def select_api() -> tuple[str, str]:
             if 0 <= idx < len(items):
                 api_name, cfg = items[idx]
                 existing_key = os.environ.get(cfg["env"], "")
+
                 if existing_key:
-                    # 已有 key，显示隐藏版本，允许直接回车确认或重新粘贴
-                    masked = existing_key[:6] + "*" * max(0, len(existing_key) - 10) + existing_key[-4:]
+                    masked = existing_key[:4] + "****" + existing_key[-4:] if len(existing_key) > 8 else "****"
                     print(f"\n  {G}当前 Key: {masked}{R}")
-                    sys.stdout.write(f"  {DIM}回车确认使用此 Key，或直接粘贴新 Key >{R} ")
+                    sys.stdout.write(f"  {DIM}直接回车使用当前 Key，或粘贴新 Key 替换 >{R} ")
                     sys.stdout.flush()
                     try:
                         new_key = read_line()
@@ -144,8 +171,8 @@ def select_api() -> tuple[str, str]:
                         sys.exit(0)
                     key = new_key.strip() if new_key.strip() else existing_key
                 else:
-                    # 未设置 key，直接要求输入
-                    print(f"\n  {Y}未检测到 {cfg['name']} Key，请直接粘贴：{R}")
+                    print(f"\n  {Y}未检测到 {cfg['name']} Key{R}")
+                    print(f"  {DIM}获取地址：{cfg['hint']}{R}")
                     sys.stdout.write(f"  {C}粘贴 API Key >{R} ")
                     sys.stdout.flush()
                     try:
@@ -155,23 +182,35 @@ def select_api() -> tuple[str, str]:
                     if not key:
                         print(f"  {Y}未输入 key，请重新选择{R}")
                         continue
+
+                # 写入环境变量
                 os.environ[cfg["env"]] = key
+
+                # 持久化保存到配置文件
+                config = load_config()
+                config[cfg["env"]] = key
+                save_config(config)
+                print(f"  {G}✓ Key 已保存，下次启动无需重新输入{R}\n")
+
                 return api_name, key
         except ValueError:
             pass
         print(f"  {Y}请输入 1-{len(items)} 之间的数字{R}")
 
 
-def build_client(api_name: str) -> tuple[OpenAI, str]:
+def build_client(api_name: str, key: str = None) -> tuple[OpenAI, str]:
     """构建 OpenAI 兼容客户端，返回 (client, model)"""
     cfg = API_CONFIGS[api_name]
-    key = os.environ.get(cfg["env"], "")
+    if key is None:
+        key = os.environ.get(cfg["env"], "")
     kwargs = {"api_key": key}
     if cfg["base_url"]:
         kwargs["base_url"] = cfg["base_url"]
     client = OpenAI(**kwargs)
     return client, cfg["default_model"]
 
+
+# ── Skill 加载 ─────────────────────────────────────────────────────────────────
 
 def fetch_skill_md(repo: str, person_name: str) -> str | None:
     """从 GitHub 拉取 SKILL.md，优先用本地缓存"""
@@ -251,6 +290,8 @@ def select_figure() -> tuple[str, str]:
             print(f"  {Y}无效输入{R}")
 
 
+# ── System Prompt ──────────────────────────────────────────────────────────────
+
 def build_system_prompt(person_name: str, skill_md: str) -> str:
     return f"""你现在是 {person_name}，不是在扮演他，就是他本人。
 
@@ -276,14 +317,15 @@ def build_system_prompt(person_name: str, skill_md: str) -> str:
 - 回答可以很短，一两句话就够，不需要把每个角度都覆盖到
 - 说完就停，不要画蛇添足
 
-【参考示例——这是正确的风格】
+【正确的风格示例】
 问：如果你现在 18 岁一无所有，你会怎么开始？
-{person_name} 应该这样回答（风格示例，不是答案）：
-  ✓ 短促有力，直接说他真正会做的第一件事
-  ✓ 可以反问，可以挑战问题本身
-  ✓ 不超过 150 字，除非问题本身需要深度展开
-  ✗ 不是列出 10 条建议"""
+✓ 短促有力，直接说他真正会做的第一件事
+✓ 可以反问，可以挑战问题本身
+✓ 不超过 150 字，除非问题本身需要深度展开
+✗ 不是列出 10 条建议"""
 
+
+# ── 对话循环 ───────────────────────────────────────────────────────────────────
 
 def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_name: str):
     """主对话循环"""
@@ -331,20 +373,16 @@ def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_n
                 stream=True,
             )
             reply_chunks = []
-            col = 0  # 追踪当前列位，用于换行缩进
             for chunk in stream:
                 delta = chunk.choices[0].delta
                 if delta and delta.content:
                     text = delta.content
                     reply_chunks.append(text)
-                    # 流式输出：换行时加缩进
                     for ch in text:
                         if ch == "\n":
                             sys.stdout.write(f"{G}\n            {R}")
-                            col = 0
                         else:
                             sys.stdout.write(f"{G}{ch}{R}")
-                            col += 1
                     sys.stdout.flush()
             print("\n")
             reply = "".join(reply_chunks).strip()
@@ -352,8 +390,8 @@ def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_n
 
         except Exception as e:
             err = str(e)
-            # 如果流式不支持，回退到普通模式
-            if "stream" in err.lower() or "streaming" in err.lower() or "400" in err:
+            # 流式不支持时回退到普通模式
+            if any(kw in err.lower() for kw in ["stream", "streaming", "not supported"]) or "400" in err:
                 try:
                     response = client.chat.completions.create(
                         model=model,
@@ -369,13 +407,23 @@ def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_n
                     continue
                 except Exception as e2:
                     err = str(e2)
-            print(f"\n  {Y}出错了: {err}{R}")
-            if "model" in err.lower() or "404" in err:
+
+            # 连接错误：给出更明确的提示
+            if "connection" in err.lower() or "connect" in err.lower():
+                print(f"\n  {Y}连接失败。可能的原因：{R}")
+                print(f"  {DIM}1. 网络问题或需要代理（VPN）{R}")
+                print(f"  {DIM}2. API Key 无效或已过期{R}")
                 cfg = API_CONFIGS[api_name]
-                print(f"  {DIM}可用模型: {', '.join(cfg['models'])}{R}")
-                print(f"  {DIM}用 --model 参数指定，例如: python chat.py --model {cfg['models'][-1]}{R}\n")
+                print(f"  {DIM}3. 重新获取 Key：{cfg['hint']}{R}\n")
+            else:
+                print(f"\n  {Y}出错了: {err}{R}")
+                if "model" in err.lower() or "404" in err:
+                    cfg = API_CONFIGS[api_name]
+                    print(f"  {DIM}可用模型: {', '.join(cfg['models'])}{R}\n")
             history.pop()
 
+
+# ── 主入口 ─────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser(
@@ -383,12 +431,12 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例：
-  python chat.py                          # 交互式选择人物和 API
-  python chat.py --person 马斯克          # 直接对话马斯克
-  python chat.py --person Karpathy        # 直接对话 Karpathy
-  python chat.py --api gemini             # 强制使用 Gemini API
-  python chat.py --api glm --person 孔子  # 用 GLM 对话孔子
-  python chat.py --skill my/SKILL.md      # 加载自定义 skill
+  anyone2skill                          # 交互式选择人物和 API
+  anyone2skill --person 马斯克          # 直接对话马斯克
+  anyone2skill --person Karpathy        # 直接对话 Karpathy
+  anyone2skill --api gemini             # 强制使用 Gemini API
+  anyone2skill --api glm --person 孔子  # 用 GLM 对话孔子
+  anyone2skill --skill my/SKILL.md      # 加载自定义 skill
         """
     )
     parser.add_argument("--person", "-p", help="人物名称（如：马斯克、Karpathy）")
@@ -398,15 +446,17 @@ def main():
     parser.add_argument("--model",  "-m", help="指定模型名称（覆盖默认）")
     args = parser.parse_args()
 
+    # 先加载保存的 key（从 ~/.anyone2skill/config.json）
+    load_saved_keys()
+
     # ── 确定使用哪个 API ──
     if args.api:
         api_name = args.api
         key = os.environ.get(API_CONFIGS[api_name]["env"], "")
         if not key:
             cfg = API_CONFIGS[api_name]
-            print(f"\n  {Y}未设置 {cfg['env']}，请先配置：{R}")
-            print(f"  {DIM}{cfg['hint']}{R}")
-            print(f"  {DIM}Windows: $env:{cfg['env']}=\"your-key\"{R}\n")
+            print(f"\n  {Y}未设置 {cfg['name']} Key{R}")
+            print(f"  {DIM}获取地址：{cfg['hint']}{R}")
             sys.stdout.write(f"  {C}直接粘贴 API Key >{R} ")
             sys.stdout.flush()
             try:
@@ -416,9 +466,17 @@ def main():
             if not key:
                 sys.exit(1)
             os.environ[cfg["env"]] = key
+            # 持久化保存
+            config = load_config()
+            config[cfg["env"]] = key
+            save_config(config)
+            print(f"  {G}✓ Key 已保存，下次启动无需重新输入{R}\n")
     else:
-        api_name, _ = detect_api()
-        if not api_name:
+        # 检测可用 key
+        available = [(n, os.environ.get(c["env"], "")) for n, c in API_CONFIGS.items() if os.environ.get(c["env"], "")]
+        if len(available) == 1:
+            api_name = available[0][0]
+        else:
             api_name, _ = select_api()
 
     client, default_model = build_client(api_name)
