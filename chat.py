@@ -92,22 +92,31 @@ def read_line() -> str:
 
 
 def detect_api() -> tuple[str, str]:
-    """自动检测可用的 API key，返回 (api_name, api_key)"""
+    """检测所有可用的 API key，如果只有一个就直接用，多个则让用户选"""
+    available = []
     for name, cfg in API_CONFIGS.items():
         key = os.environ.get(cfg["env"], "")
         if key:
-            return name, key
+            available.append((name, key))
+    if len(available) == 1:
+        return available[0]
     return None, None
 
 
 def select_api() -> tuple[str, str]:
-    """交互式选择 API"""
-    print(f"\n  {Y}{B}未检测到 API Key，请选择要使用的 API：{R}\n")
+    """交互式选择 API，显示所有已检测到的 key"""
     items = list(API_CONFIGS.items())
+    available_count = sum(1 for _, cfg in items if os.environ.get(cfg["env"], ""))
+
+    if available_count > 1:
+        print(f"\n  {Y}{B}检测到多个 API Key，请选择要使用的：{R}\n")
+    else:
+        print(f"\n  {B}请选择要使用的 API：{R}\n")
+
     for i, (name, cfg) in enumerate(items, 1):
         key = os.environ.get(cfg["env"], "")
         status = f"{G}✓ 已设置{R}" if key else f"{DIM}未设置{R}"
-        print(f"  {C}{B}[{i}]{R}  {B}{cfg['name']:<12}{R}  {status}")
+        print(f"  {C}{B}[{i}]{R}  {B}{cfg['name']:<14}{R}  {status}")
     print()
 
     while True:
@@ -124,10 +133,9 @@ def select_api() -> tuple[str, str]:
                 api_name, cfg = items[idx]
                 key = os.environ.get(cfg["env"], "")
                 if not key:
-                    print(f"\n  {Y}请先设置环境变量：{R}")
-                    print(f"  {DIM}{cfg['hint']}{R}")
+                    print(f"\n  {Y}该 API 未设置 Key，请直接粘贴：{R}")
                     print(f"  {DIM}Windows: $env:{cfg['env']}=\"your-key\"{R}\n")
-                    sys.stdout.write(f"  {C}直接粘贴 API Key（回车确认）>{R} ")
+                    sys.stdout.write(f"  {C}粘贴 API Key >{R} ")
                     sys.stdout.flush()
                     try:
                         key = read_line()
