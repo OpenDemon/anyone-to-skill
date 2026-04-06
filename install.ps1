@@ -1,5 +1,6 @@
 # Anyone to Skill - One-click installer for Windows PowerShell
 # Usage: iwr -useb https://raw.githubusercontent.com/OpenDemon/anyone-to-skill/master/install.ps1 | iex
+# Version: 1.3
 
 # Force UTF-8 output to avoid garbled text
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -47,7 +48,8 @@ Write-Host "  [3/4] Configure API Key" -ForegroundColor White
 Write-Host "  Supports OpenAI / Gemini / GLM. Configure at least one." -ForegroundColor Yellow
 Write-Host ""
 
-$configDir = Join-Path $env:USERPROFILE ".anyone2skill"
+$homeDir = if ($env:USERPROFILE) { $env:USERPROFILE } elseif ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
+$configDir = Join-Path $homeDir ".anyone2skill"
 $configFile = Join-Path $configDir "config.json"
 
 if (-not (Test-Path $configDir)) {
@@ -72,12 +74,12 @@ function Prompt-Key {
         $masked = $existing.Substring(0, [Math]::Min(4, $len)) + "****" + $existing.Substring([Math]::Max(0, $len - 4))
         Write-Host "  $Label : already set ($masked)" -ForegroundColor Green
         $new = Read-Host "  Press Enter to keep, or paste new key to replace"
-        if ($new.Trim()) { return $new.Trim() } else { return $existing }
+        if ($new -and $new.Trim()) { return $new.Trim() } else { return $existing }
     } else {
         Write-Host "  $Label : not set" -ForegroundColor Yellow
         Write-Host "  Get key: $Hint" -ForegroundColor Cyan
         $new = Read-Host "  Paste key (Enter to skip)"
-        return $new.Trim()
+        if ($new) { return $new.Trim() } else { return "" }
     }
 }
 
