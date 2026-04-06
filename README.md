@@ -272,13 +272,67 @@ Karpathy  ❯ 这个问题本身可能预设了一个错误的二分法。
 
 ---
 
-## 安装
+## 直接在终端里对话（最简单）
+
+克隆仓库，运行一条命令，选人物，直接聊：
+
+```bash
+git clone https://github.com/OpenDemon/anyone-to-skill
+cd anyone-to-skill
+pip install openai
+export OPENAI_API_KEY=sk-...   # Windows: $env:OPENAI_API_KEY="sk-..."
+python chat.py
+```
+
+启动后会看到：
+
+```
+  ╔══════════════════════════════════════════════════════╗
+  ║         A N Y O N E   T O   S K I L L               ║
+  ║       与任何人直接对话 · 在终端里                     ║
+  ╚══════════════════════════════════════════════════════╝
+
+  选择你想对话的人物：
+
+  [ 1]  马斯克        科技创业 · 第一性原理
+  [ 2]  乔布斯        产品设计 · 极简主义
+  [ 3]  比尔盖茨      软件战略 · 全球健康
+  [ 4]  段永平        价值投资 · 本分哲学
+  [ 5]  纳瓦尔        财富自由 · 特定知识
+  [ 6]  张雪峰        教育规划 · 务实主义
+  [ 7]  孔子          仁义礼学 · 修身齐家
+  [ 8]  庄子          逍遥哲学 · 齐物论
+  [ 9]  Karpathy     深度学习 · AI 教育
+  [10]  黄仁勋        芯片战略 · 加速主义
+  [11]  Dan Koe      一人企业 · 个人品牌
+  [ 0]  加载本地 SKILL.md 文件
+
+  输入编号 > 1
+```
+
+输入编号后直接开始对话，支持多轮上下文，`/reset` 清空历史，`/quit` 退出。
+
+也可以直接指定人物跳过选择界面：
+
+```bash
+python chat.py --person 马斯克
+python chat.py --person Karpathy
+python chat.py --skill path/to/your/SKILL.md   # 加载自定义 skill
+```
+
+---
+
+## 安装到 AI 编程工具（Cursor / Claude Code 等）
 
 ```bash
 npx skills add OpenDemon/anyone-to-skill
 ```
 
-或手动克隆：
+安装后在 Claude Code / Cursor 里说「蒸馏马斯克」「把这个 PDF 做成 skill」即可触发。
+
+---
+
+## 克隆仓库
 
 ```bash
 git clone https://github.com/OpenDemon/anyone-to-skill
