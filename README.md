@@ -225,3 +225,19 @@ pip install git+https://github.com/OpenDemon/anyone-to-skill.git
 anyone2skill
 ```
 
+
+---
+
+## 截图
+
+**与马斯克对话**
+
+![与马斯克对话](docs/screenshots/demo-musk.png)
+
+**与黄仁勋对话**
+
+![与黄仁勋对话](docs/screenshots/demo-jensen.png)
+
+**蒸馏模式：自动搜索 YouTube 字幕**
+
+![蒸馏模式](docs/screenshots/demo-distill.png)
