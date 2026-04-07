@@ -429,18 +429,57 @@ def chat_loop(person_name: str, skill_md: str, client: OpenAI, model: str, api_n
 
 def main():
     parser = argparse.ArgumentParser(
-        description="与任何人在终端里直接对话",
+        description="与任何人在终端里直接对话，或蒸馏新人物",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 示例：
-  anyone2skill                          # 交互式选择人物和 API
-  anyone2skill --person 马斯克          # 直接对话马斯克
-  anyone2skill --person Karpathy        # 直接对话 Karpathy
-  anyone2skill --api gemini             # 强制使用 Gemini API
-  anyone2skill --api glm --person 孔子  # 用 GLM 对话孔子
-  anyone2skill --skill my/SKILL.md      # 加载自定义 skill
+  anyone2skill                              # 交互式选择人物和 API
+  anyone2skill --person 马斯克              # 直接对话马斯克
+  anyone2skill --person Karpathy            # 直接对话 Karpathy
+  anyone2skill --api gemini                 # 强制使用 Gemini API
+  anyone2skill --api glm --person 孔子      # 用 GLM 对话孔子
+  anyone2skill --skill my/SKILL.md          # 加载自定义 skill
+  anyone2skill distill --name 黄仁勋        # 自动蒸馏新人物（搜索15个视频）
+  anyone2skill distill --name 黄仁勋 --videos 20  # 搜索20个视频
+  anyone2skill distill --name 黄仁勋 --file interview.pdf  # 加入本地文件
         """
     )
+
+    # 检查是否是 distill 子命令
+    if len(sys.argv) > 1 and sys.argv[1] == "distill":
+        distill_parser = argparse.ArgumentParser(description="自动蒸馏新人物")
+        distill_parser.add_argument("--name", "-n", required=True, help="人物名称（如：黄仁勋）")
+        distill_parser.add_argument("--videos", type=int, default=15, help="搜索视频数量（默认15）")
+        distill_parser.add_argument("--youtube", action="append", metavar="URL", help="额外指定 YouTube URL（可多次使用）")
+        distill_parser.add_argument("--file", action="append", metavar="PATH", help="额外指定本地文件（PDF/TXT，可多次使用）")
+        distill_parser.add_argument("--api", "-a", choices=["openai", "gemini", "glm"], help="指定 API")
+        distill_parser.add_argument("--model", "-m", help="指定模型名称")
+        distill_args = distill_parser.parse_args(sys.argv[2:])
+
+        # 加载 key
+        load_saved_keys()
+        if distill_args.api:
+            api_name = distill_args.api
+        else:
+            available = [(n, os.environ.get(c["env"], "")) for n, c in API_CONFIGS.items() if os.environ.get(c["env"], "")]
+            if not available:
+                api_name, _ = select_api()
+            else:
+                config = load_config()
+                last_api = None
+                for env_key in config:
+                    for n, c in API_CONFIGS.items():
+                        if c["env"] == env_key and config.get(env_key):
+                            last_api = n
+                api_name = last_api or available[0][0]
+
+        client, default_model = build_client(api_name)
+        model = distill_args.model or default_model
+
+        from anyone2skill.distill import run_distill
+        run_distill(distill_args, client, model)
+        return
+
     parser.add_argument("--person", "-p", help="人物名称（如：马斯克、Karpathy）")
     parser.add_argument("--skill",  "-s", help="本地 SKILL.md 文件路径")
     parser.add_argument("--api",    "-a", choices=["openai", "gemini", "glm"],

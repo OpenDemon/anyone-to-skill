@@ -13,6 +13,12 @@ dependencies = [
     "openai>=1.0.0",
 ]
 
+[project.optional-dependencies]
+distill = [
+    "yt-dlp>=2024.0.0",
+    "youtube-transcript-api>=0.6.0",
+]
+
 [project.scripts]
 anyone2skill = "anyone2skill.cli:main"
 
